@@ -57,6 +57,9 @@ RL.init = function () {
   'use strict';
   RL.display = new ROT.Display();
   document.body.appendChild(RL.display.getContainer());
+  RL.display.setOptions({
+    fontSize: RL.display.computeFontSize(window.innerWidth, window.innerHeight)
+  });
   RL.fov = new ROT.FOV.PreciseShadowcasting(function (x, y) {
     return !RL.map[x + ',' + y];
   });
