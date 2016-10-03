@@ -26,32 +26,26 @@ window.addEventListener('keypress', function (e) {
 
 window.addEventListener('click', function (e) {
   'use strict';
-  if (RL.hero) {
-    if (RL.display.eventToPosition(e)[0] < RL.hero.x) {
-      RL.move(RL.hero, -1, 0);
-    } else if (RL.display.eventToPosition(e)[0] > RL.hero.x) {
-      RL.move(RL.hero, 1, 0);
-    }
-    if (RL.display.eventToPosition(e)[1] > RL.hero.y) {
-      RL.move(RL.hero, 0, 1);
-    } else if (RL.display.eventToPosition(e)[1] < RL.hero.y) {
-      RL.move(RL.hero, 0, -1);
-    }
-    RL.moveEnemies();
-    RL.drawExplored();
-    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
-  }
+  RL.moveHero();
 });
 
-RL.moveEnemies = function () {
+window.addEventListener('mousemove', function (e) {
   'use strict';
-  var i, x, y;
-  for (i = 0; i < RL.enemies.length; i += 1) {
-    x = Math.floor(Math.random() * 3 - 1);
-    y = Math.floor(Math.random() * 3 - 1);
-    RL.move(RL.enemies[i], x, y);
-  }
-};
+  RL.mouse = {
+    x: RL.display.eventToPosition(e)[0],
+    y: RL.display.eventToPosition(e)[1]
+  };
+});
+
+window.addEventListener('mousedown', function (e) {
+  'use strict';
+  RL.mousedown = true;
+});
+
+window.addEventListener('mouseup', function (e) {
+  'use strict';
+  RL.mousedown = false;
+});
 
 RL.init = function () {
   'use strict';
@@ -66,6 +60,11 @@ RL.init = function () {
   RL.explored = [];
   RL.generateMap();
   RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+  setInterval(function () {
+    if (RL.mousedown) {
+      RL.moveHero();
+    }
+  }, 200);
 };
 
 RL.generateMap = function () {
@@ -102,6 +101,35 @@ RL.move = function (actor, x, y) {
     }
     actor.x += x;
     actor.y += y;
+  }
+};
+
+RL.moveHero = function () {
+  'use strict';
+  if (RL.hero) {
+    if (RL.mouse.x < RL.hero.x) {
+      RL.move(RL.hero, -1, 0);
+    } else if (RL.mouse.x > RL.hero.x) {
+      RL.move(RL.hero, 1, 0);
+    }
+    if (RL.mouse.y > RL.hero.y) {
+      RL.move(RL.hero, 0, 1);
+    } else if (RL.mouse.y < RL.hero.y) {
+      RL.move(RL.hero, 0, -1);
+    }
+    RL.moveEnemies();
+    RL.drawExplored();
+    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+  }
+};
+
+RL.moveEnemies = function () {
+  'use strict';
+  var i, x, y;
+  for (i = 0; i < RL.enemies.length; i += 1) {
+    x = Math.floor(Math.random() * 3 - 1);
+    y = Math.floor(Math.random() * 3 - 1);
+    RL.move(RL.enemies[i], x, y);
   }
 };
 
