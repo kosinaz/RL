@@ -8,7 +8,6 @@ window.addEventListener('load', function (e) {
 
 window.addEventListener('keypress', function (e) {
   'use strict';
-  var x, y, i;
   if (RL.hero) {
     if (e.keyCode === 97) {
       RL.move(RL.hero, -1, 0);
@@ -19,18 +18,40 @@ window.addEventListener('keypress', function (e) {
     } else if (e.keyCode === 119) {
       RL.move(RL.hero, 0, -1);
     }
-    for (i = 0; i < RL.enemies.length; i += 1) {
-      x = Math.floor(Math.random() * 3 - 1);
-      y = 0;
-      if (x === 0) {
-        y = Math.floor(Math.random() * 3 - 1);
-      }
-      RL.move(RL.enemies[i], x, y);
-    }
+    RL.moveEnemies();
     RL.drawExplored();
     RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
   }
 });
+
+window.addEventListener('click', function (e) {
+  'use strict';
+  if (RL.hero) {
+    if (RL.display.eventToPosition(e)[0] < RL.hero.x) {
+      RL.move(RL.hero, -1, 0);
+    } else if (RL.display.eventToPosition(e)[0] > RL.hero.x) {
+      RL.move(RL.hero, 1, 0);
+    }
+    if (RL.display.eventToPosition(e)[1] > RL.hero.y) {
+      RL.move(RL.hero, 0, 1);
+    } else if (RL.display.eventToPosition(e)[1] < RL.hero.y) {
+      RL.move(RL.hero, 0, -1);
+    }
+    RL.moveEnemies();
+    RL.drawExplored();
+    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+  }
+});
+
+RL.moveEnemies = function () {
+  'use strict';
+  var i, x, y;
+  for (i = 0; i < RL.enemies.length; i += 1) {
+    x = Math.floor(Math.random() * 3 - 1);
+    y = Math.floor(Math.random() * 3 - 1);
+    RL.move(RL.enemies[i], x, y);
+  }
+};
 
 RL.init = function () {
   'use strict';
@@ -99,7 +120,7 @@ RL.drawXY = function (x, y, r, visibility) {
   RL.explored[x + ',' + y] = RL.map[x + ',' + y];
   for (i = 0; i < RL.enemies.length; i += 1) {
     if (RL.enemies[i].x === x && RL.enemies[i].y === y) {
-      RL.display.draw(x, y, '€');
+      RL.display.draw(x, y, String.fromCharCode(i + 97));
       return;
     }
   }
