@@ -55,7 +55,7 @@ window.addEventListener('mousedown', function (e) {
        */
       RL.moveHero();
     }, 100);
-  }, 100);
+  }, 300);
 });
 
 window.addEventListener('mouseup', function (e) {
