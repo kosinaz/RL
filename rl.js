@@ -1,51 +1,5 @@
 var ROT = ROT || {};
 var RL = {};
-window.addEventListener('load', function (e) {
-  'use strict';
-  window.removeEventListener('load', this);
-  RL.init();
-});
-
-window.addEventListener('keypress', function (e) {
-  'use strict';
-  if (RL.hero) {
-    if (e.keyCode === 97) {
-      RL.move(RL.hero, -1, 0);
-    } else if (e.keyCode === 100) {
-      RL.move(RL.hero, 1, 0);
-    } else if (e.keyCode === 115) {
-      RL.move(RL.hero, 0, 1);
-    } else if (e.keyCode === 119) {
-      RL.move(RL.hero, 0, -1);
-    }
-    RL.moveEnemies();
-    RL.drawExplored();
-    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
-  }
-});
-
-window.addEventListener('click', function (e) {
-  'use strict';
-  RL.moveHero();
-});
-
-window.addEventListener('mousemove', function (e) {
-  'use strict';
-  RL.mouse = {
-    x: RL.display.eventToPosition(e)[0],
-    y: RL.display.eventToPosition(e)[1]
-  };
-});
-
-window.addEventListener('mousedown', function (e) {
-  'use strict';
-  RL.mousedown = true;
-});
-
-window.addEventListener('mouseup', function (e) {
-  'use strict';
-  RL.mousedown = false;
-});
 
 RL.init = function () {
   'use strict';
@@ -60,11 +14,6 @@ RL.init = function () {
   RL.explored = [];
   RL.generateMap();
   RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
-  setInterval(function () {
-    if (RL.mousedown) {
-      RL.moveHero();
-    }
-  }, 200);
 };
 
 RL.generateMap = function () {
