@@ -16,8 +16,11 @@ RL.init = function () {
   RL.levels = [];
   RL.levels[RL.level] = {};
   RL.current = RL.levels[RL.level];
+  RL.scheduler = new ROT.Scheduler.Action();
+  RL.engine = new ROT.Engine(RL.scheduler);
   RL.generateMap();
-  RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+  RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
+  RL.engine.start();
 };
 
 RL.changeLevel = function (level) {
@@ -25,16 +28,18 @@ RL.changeLevel = function (level) {
   RL.level = level;
   if (RL.levels[RL.level]) {
     RL.current = RL.levels[RL.level];
-    RL.hero = {
-      x: RL.current.rooms[0].getCenter()[0],
-      y: RL.current.rooms[0].getCenter()[1]
-    };
+    RL.player = new RL.Player(
+      RL.current.rooms[0].getCenter()[0],
+      RL.current.rooms[0].getCenter()[1],
+      RL.scheduler,
+      RL.engine
+    );
   } else {
     RL.levels[RL.level] = {};
     RL.current = RL.levels[RL.level];
     RL.generateMap();
   }
-  RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+  RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
 };
 
 RL.generateMap = function () {
@@ -44,18 +49,17 @@ RL.generateMap = function () {
   RL.current.enemies = [];
   RL.digger.create(function (x, y, value) {
     if (!value && Math.random() * 100 < 1) {
-      RL.current.enemies.push({
-        x: x,
-        y: y
-      });
+      RL.current.enemies.push(new RL.Actor(x, y, RL.scheduler));
     }
     RL.current.map[x + ',' + y] = value;
   });
   RL.current.rooms = RL.digger.getRooms();
-  RL.hero = {
-    x: RL.current.rooms[0].getCenter()[0],
-    y: RL.current.rooms[0].getCenter()[1]
-  };
+  RL.player = new RL.Player(
+    RL.current.rooms[0].getCenter()[0],
+    RL.current.rooms[0].getCenter()[1],
+    RL.scheduler,
+    RL.engine
+  );
   RL.current.exit = {
     x: RL.current.rooms[RL.current.rooms.length - 1].getCenter()[0],
     y: RL.current.rooms[RL.current.rooms.length - 1].getCenter()[1],
@@ -66,11 +70,11 @@ RL.generateMap = function () {
 RL.move = function (actor, x, y) {
   'use strict';
   var i;
-  if (RL.hero.x === RL.current.exit.x && RL.hero.y === RL.current.exit.y) {
+  if (RL.player.x === RL.current.exit.x && RL.player.y === RL.current.exit.y) {
     RL.changeLevel(RL.current.exit.level);
   }
   if (!(RL.current.map[(actor.x + x) + ',' + (actor.y + y)])) {
-    if (RL.hero.x === actor.x + x && RL.hero.y === actor.y + y) {
+    if (RL.player.x === actor.x + x && RL.player.y === actor.y + y) {
       return;
     }
     for (i = 0; i < RL.current.enemies.length; i += 1) {
@@ -84,32 +88,22 @@ RL.move = function (actor, x, y) {
   }
 };
 
-RL.moveHero = function () {
+RL.movePlayer = function () {
   'use strict';
-  if (RL.hero) {
-    if (RL.mouse.x < RL.hero.x) {
-      RL.move(RL.hero, -1, 0);
-    } else if (RL.mouse.x > RL.hero.x) {
-      RL.move(RL.hero, 1, 0);
+  if (RL.player) {
+    if (RL.mouse.x < RL.player.x) {
+      RL.move(RL.player, -1, 0);
+    } else if (RL.mouse.x > RL.player.x) {
+      RL.move(RL.player, 1, 0);
     }
-    if (RL.mouse.y > RL.hero.y) {
-      RL.move(RL.hero, 0, 1);
-    } else if (RL.mouse.y < RL.hero.y) {
-      RL.move(RL.hero, 0, -1);
+    if (RL.mouse.y > RL.player.y) {
+      RL.move(RL.player, 0, 1);
+    } else if (RL.mouse.y < RL.player.y) {
+      RL.move(RL.player, 0, -1);
     }
-    RL.moveEnemies();
     RL.drawExplored();
-    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
-  }
-};
-
-RL.moveEnemies = function () {
-  'use strict';
-  var i, x, y;
-  for (i = 0; i < RL.current.enemies.length; i += 1) {
-    x = Math.floor(Math.random() * 3 - 1);
-    y = Math.floor(Math.random() * 3 - 1);
-    RL.move(RL.current.enemies[i], x, y);
+    RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
+    RL.engine.unlock();
   }
 };
 
@@ -144,8 +138,8 @@ RL.drawXY = function (x, y, r, visibility) {
       return;
     }
   }
-  if (RL.hero.x === x && RL.hero.y === y) {
-    RL.display.draw(RL.hero.x, RL.hero.y, '@');
+  if (RL.player.x === x && RL.player.y === y) {
+    RL.display.draw(RL.player.x, RL.player.y, '@');
     return;
   }
   if (RL.current.exit.x === x && RL.current.exit.y === y) {

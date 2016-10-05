@@ -8,19 +8,19 @@ window.addEventListener('load', function (e) {
 
 window.addEventListener('keypress', function (e) {
   'use strict';
-  if (RL.hero) {
+  if (RL.player) {
     if (e.keyCode === 97) {
-      RL.move(RL.hero, -1, 0);
+      RL.move(RL.player, -1, 0);
     } else if (e.keyCode === 100) {
-      RL.move(RL.hero, 1, 0);
+      RL.move(RL.player, 1, 0);
     } else if (e.keyCode === 115) {
-      RL.move(RL.hero, 0, 1);
+      RL.move(RL.player, 0, 1);
     } else if (e.keyCode === 119) {
-      RL.move(RL.hero, 0, -1);
+      RL.move(RL.player, 0, -1);
     }
-    RL.moveEnemies();
     RL.drawExplored();
-    RL.fov.compute(RL.hero.x, RL.hero.y, 80, RL.drawXY);
+    RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
+    RL.engine.unlock();
   }
 });
 
@@ -53,7 +53,7 @@ window.addEventListener('mousedown', function (e) {
        * If the mouse button is not released, the interval won't be cleared,
        * and the action will repeated over and over.
        */
-      RL.moveHero();
+      RL.movePlayer();
     }, 100);
   }, 300);
 });
@@ -88,7 +88,7 @@ window.addEventListener('mouseup', function (e) {
      * the action can be performed immediately after the release of
      * the mouse button.
      */
-    RL.moveHero();
+    RL.movePlayer();
   }
 
   /*
