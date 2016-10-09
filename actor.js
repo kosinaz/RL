@@ -54,7 +54,9 @@ RL.Actor.prototype.move = function (x, y) {
   if (this.level.map[x + ',' + y]) {
     return;
   }
-  if (RL.player.x === x && RL.player.y === y) {
+  if (RL.player.x === x &&
+      RL.player.y === y &&
+      RL.player.level === this.level) {
     RL.player.hit();
     return;
   }
