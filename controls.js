@@ -10,23 +10,33 @@ window.addEventListener('keypress', function (e) {
   'use strict';
   if (RL.player) {
     if (e.keyCode === 97) {
-      RL.move(RL.player, -1, 0);
+      RL.player.target = {
+        x: RL.player.x - 1,
+        y: RL.player.y
+      };
     } else if (e.keyCode === 100) {
-      RL.move(RL.player, 1, 0);
+      RL.player.target = {
+        x: RL.player.x + 1,
+        y: RL.player.y
+      };
     } else if (e.keyCode === 115) {
-      RL.move(RL.player, 0, 1);
+      RL.player.target = {
+        x: RL.player.x,
+        y: RL.player.y + 1
+      };
     } else if (e.keyCode === 119) {
-      RL.move(RL.player, 0, -1);
+      RL.player.target = {
+        x: RL.player.x,
+        y: RL.player.y - 1
+      };
     }
-    RL.drawExplored();
-    RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
-    RL.engine.unlock();
+    RL.player.move();
   }
 });
 
 window.addEventListener('mousemove', function (e) {
   'use strict';
-  RL.mouse = {
+  RL.player.target = {
     x: RL.display.eventToPosition(e)[0],
     y: RL.display.eventToPosition(e)[1]
   };
@@ -53,7 +63,7 @@ window.addEventListener('mousedown', function (e) {
        * If the mouse button is not released, the interval won't be cleared,
        * and the action will repeated over and over.
        */
-      RL.movePlayer();
+      RL.player.move();
     }, 100);
   }, 300);
 });
@@ -88,7 +98,7 @@ window.addEventListener('mouseup', function (e) {
      * the action can be performed immediately after the release of
      * the mouse button.
      */
-    RL.movePlayer();
+    RL.player.move();
   }
 
   /*
