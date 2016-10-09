@@ -30,7 +30,7 @@ window.addEventListener('keypress', function (e) {
         y: RL.player.y - 1
       };
     }
-    RL.player.move();
+    RL.player.moveAndUnlock();
   }
 });
 
@@ -63,7 +63,7 @@ window.addEventListener('mousedown', function (e) {
        * If the mouse button is not released, the interval won't be cleared,
        * and the action will repeated over and over.
        */
-      RL.player.move();
+      RL.player.moveAndUnlock();
     }, 100);
   }, 300);
 });
@@ -98,7 +98,7 @@ window.addEventListener('mouseup', function (e) {
      * the action can be performed immediately after the release of
      * the mouse button.
      */
-    RL.player.move();
+    RL.player.moveAndUnlock();
   }
 
   /*
