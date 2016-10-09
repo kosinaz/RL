@@ -28,12 +28,8 @@ RL.changeLevel = function (level) {
   RL.level = level;
   if (RL.levels[RL.level]) {
     RL.current = RL.levels[RL.level];
-    RL.player = new RL.Player(
-      RL.current.rooms[0].getCenter()[0],
-      RL.current.rooms[0].getCenter()[1],
-      RL.scheduler,
-      RL.engine
-    );
+    RL.player.x = RL.current.rooms[0].getCenter()[0];
+    RL.player.y = RL.current.rooms[0].getCenter()[1];
   } else {
     RL.levels[RL.level] = {};
     RL.current = RL.levels[RL.level];
@@ -54,12 +50,17 @@ RL.generateMap = function () {
     RL.current.map[x + ',' + y] = value;
   });
   RL.current.rooms = RL.digger.getRooms();
-  RL.player = new RL.Player(
-    RL.current.rooms[0].getCenter()[0],
-    RL.current.rooms[0].getCenter()[1],
-    RL.scheduler,
-    RL.engine
-  );
+  if (RL.player === undefined) {
+    RL.player = new RL.Player(
+      RL.current.rooms[0].getCenter()[0],
+      RL.current.rooms[0].getCenter()[1],
+      RL.scheduler,
+      RL.engine
+    );
+  } else {
+    RL.player.x = RL.current.rooms[0].getCenter()[0];
+    RL.player.y = RL.current.rooms[0].getCenter()[1];
+  }
   RL.current.exit = {
     x: RL.current.rooms[RL.current.rooms.length - 1].getCenter()[0],
     y: RL.current.rooms[RL.current.rooms.length - 1].getCenter()[1],
@@ -85,25 +86,6 @@ RL.move = function (actor, x, y) {
     }
     actor.x += x;
     actor.y += y;
-  }
-};
-
-RL.movePlayer = function () {
-  'use strict';
-  if (RL.player) {
-    if (RL.mouse.x < RL.player.x) {
-      RL.move(RL.player, -1, 0);
-    } else if (RL.mouse.x > RL.player.x) {
-      RL.move(RL.player, 1, 0);
-    }
-    if (RL.mouse.y > RL.player.y) {
-      RL.move(RL.player, 0, 1);
-    } else if (RL.mouse.y < RL.player.y) {
-      RL.move(RL.player, 0, -1);
-    }
-    RL.drawExplored();
-    RL.fov.compute(RL.player.x, RL.player.y, 80, RL.drawXY);
-    RL.engine.unlock();
   }
 };
 
